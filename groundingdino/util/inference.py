@@ -36,6 +36,20 @@ def load_model(model_config_path: str, model_checkpoint_path: str, device: str =
     return model
 
 
+def load_image_from_path(image_path: str) -> Tuple[np.array, torch.Tensor]:
+    transform = T.Compose(
+        [
+            T.RandomResize([800], max_size=1333),
+            T.ToTensor(),
+            T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+        ]
+    )
+    image_source = Image.open(image_path).convert("RGB")
+    image = np.asarray(image_source)
+    image_transformed, _ = transform(image_source, None)
+    return image, image_transformed
+
+
 def load_image(image_source: Image.Image) -> Tuple[np.array, torch.Tensor]:
     transform = T.Compose(
         [
@@ -45,8 +59,7 @@ def load_image(image_source: Image.Image) -> Tuple[np.array, torch.Tensor]:
         ]
     )
     image = np.asarray(image_source.convert("RGB"))
-    image_tensor = torch.from_numpy(image).permute(2, 0, 1).float()
-    image_transformed, _ = transform(image_tensor, None)
+    image_transformed, _ = transform(image, None)
     return image, image_transformed
 
 
